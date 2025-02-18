@@ -2,11 +2,11 @@ import { connect } from '@/dbConfig/dbConfig'
 import User from '@/model/userModel'
 import { NextRequest, NextResponse } from 'next/server'
 import bcryptjs from 'bcryptjs'
+import { sendEmail } from "@/helpers/mailer";
+
 
 
 connect()
-
-
 
 export async function POST(request: NextRequest) {
     try {
@@ -42,7 +42,10 @@ export async function POST(request: NextRequest) {
             password:hashedPassword
         })
 
-        console.log(user)
+        //send verification email
+
+        await sendEmail({email,emailType:'VERIFY',userId:user._id})
+
 
         return NextResponse.json({
             message:"User created successfully",
@@ -55,7 +58,7 @@ export async function POST(request: NextRequest) {
         },{status:201})
 
 
-    } catch (error) {
-        return NextResponse.json({ error }, { status: 500 })
+    } catch (error:any) {
+        return NextResponse.json({ error:error.message }, { status: 500 })
     }
 }
